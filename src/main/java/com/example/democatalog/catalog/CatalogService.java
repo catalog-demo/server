@@ -32,7 +32,7 @@ public class CatalogService {
                         .searchResultType(result.getSearchResultType())
                         .searchResultSubType(result.getSearchResultSubtype())
                         .relativeResourceName(result.getRelativeResourceName())
-                        .linkedResource(result.getLinkedResource())
+                        .linkedResource(parseToLinkResource(result.getLinkedResource()))
                         .modifyTime(result.getModifyTime().getSeconds())
                         .integratedSystem(result.getIntegratedSystem())
                         .description(result.getDescription())
@@ -41,5 +41,20 @@ public class CatalogService {
             }
         }
         return catalogResponses;
+    }
+
+    private String parseToLinkResource(String linkResource){
+        String temp = linkResource.substring(2);
+        String[] tempArray = temp.split("/");
+        String projectName = tempArray[2];
+        String dataset = tempArray[4];
+        if(linkResource.contains("tables")){
+            String tableName = tempArray[6];
+            return String.format("https://console.cloud.google.com/bigquery?project=%s&d=%s&p=%s&t=%s&page=table&" +
+                    "ws=!1m5!1m4!4m3!1s%s!2s%s!3s%s", projectName, dataset, projectName, tableName, projectName, dataset, tableName);
+        }else{
+            return String.format("https://console.cloud.google.com/bigquery?project=%s&d=%s&p=%s&page=dataset&" +
+                    "ws=!1m4!1m3!3m2!1s%s!2s%s", projectName, dataset, projectName, projectName, dataset);
+        }
     }
 }
